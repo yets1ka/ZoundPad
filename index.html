@@ -1,0 +1,1208 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>RetroBeat Groovebox Pro - PWA v4.1</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            background-color: #0d0d0f;
+            color: #e1e1e6;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 8px;
+            font-size: 15px;
+        }
+
+        h1 {
+            font-size: 20px;
+            text-align: center;
+            margin-bottom: 2px;
+            color: #00ffcc;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 11px;
+            color: #777;
+            margin-bottom: 10px;
+        }
+
+        .container {
+            max-width: 980px;
+            margin: 0 auto;
+            background: #16161a;
+            border: 2px solid #2a2a30;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+
+        /* Master Transport */
+        .master-panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            background: #101013;
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid #222;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .control-group label {
+            font-size: 10px;
+            color: #00ffcc;
+            text-transform: uppercase;
+        }
+
+        button, select, input[type="range"] {
+            font-family: inherit;
+            background: #222228;
+            color: #fff;
+            border: 1px solid #444;
+            padding: 5px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        button {
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.1s;
+        }
+
+        button:active {
+            transform: scale(0.96);
+        }
+
+        .btn-primary {
+            background: #00ffcc;
+            color: #000;
+            border: none;
+        }
+
+        .btn-primary.active {
+            background: #ff0055;
+            color: #fff;
+            box-shadow: 0 0 10px #ff0055;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #222;
+            padding-bottom: 6px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: #1a1a20;
+            border: 1px solid #333;
+            color: #aaa;
+            padding: 7px 12px;
+            border-radius: 4px 4px 0 0;
+            cursor: pointer;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            background: #16161a;
+            color: #00ffcc;
+            border-color: #00ffcc;
+            border-bottom: 2px solid #16161a;
+            margin-bottom: -8px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Racks */
+        .rack-section {
+            background: #121215;
+            border: 1px solid #222;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .rack-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #ff0055;
+        }
+
+        /* Drum Grid */
+        .track-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 5px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .track-label {
+            width: 95px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #ccc;
+            flex-shrink: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .step-btn {
+            width: 30px;
+            height: 36px;
+            background: #1e1e24;
+            border: 1px solid #333;
+            border-radius: 3px;
+            flex-shrink: 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            color: #666;
+        }
+
+        .step-btn.active {
+            background: #00ffcc;
+            border-color: #fff;
+            color: #000;
+            box-shadow: 0 0 5px rgba(0,255,204,0.5);
+        }
+
+        .step-btn.current {
+            border-color: #ff0055 !important;
+        }
+
+        .drum-vol-slider {
+            width: 70px;
+            height: 18px;
+            margin-left: 8px;
+            flex-shrink: 0;
+            accent-color: #00ffcc;
+            cursor: pointer;
+        }
+
+        /* Synth Rack */
+        .synth-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 8px;
+            background: #18181d;
+            padding: 6px;
+            border-radius: 4px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .synth-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        /* Classic Keyboard Layout (Version 1 style) - Large iPad touch friendly */
+        .keyboard-container {
+            position: relative;
+            overflow-x: auto;
+            padding: 8px 0;
+            background: #101013;
+            border-radius: 6px;
+            border: 1px solid #222;
+            margin-bottom: 10px;
+        }
+
+        .keyboard {
+            display: flex;
+            position: relative;
+            height: 130px;
+            min-width: 650px;
+            margin: 0 auto;
+            justify-content: center;
+        }
+
+        .key {
+            width: 48px;
+            height: 120px;
+            background: #f0f0f5;
+            color: #111;
+            border-radius: 0 0 6px 6px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 10px;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+            flex-shrink: 0;
+            border: 1px solid #ccc;
+            z-index: 1;
+        }
+
+        .key.black {
+            background: #222;
+            color: #fff;
+            width: 32px;
+            height: 75px;
+            margin-left: -16px;
+            margin-right: -16px;
+            z-index: 3;
+            border: 1px solid #000;
+            border-radius: 0 0 4px 4px;
+        }
+
+        .key:active, .key.active-key {
+            background: #ff0055 !important;
+            color: #fff !important;
+        }
+
+        /* Fullscreen Modal Piano Roll (DAW style with 4 bars x 4 beats) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .piano-roll-modal {
+            background: #141418;
+            border: 2px solid #00ffcc;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 1000px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.9);
+        }
+
+        .pr-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #222;
+            padding-bottom: 8px;
+        }
+
+        .pr-modal-header h2 {
+            font-size: 15px;
+            color: #00ffcc;
+        }
+
+        .pr-workspace {
+            display: flex;
+            overflow-y: auto;
+            max-height: 65vh;
+            background: #0a0a0d;
+            border: 1px solid #222;
+            border-radius: 4px;
+        }
+
+        .pr-keys-col {
+            width: 80px;
+            flex-shrink: 0;
+            background: #111;
+            border-right: 2px solid #333;
+        }
+
+        .pr-key-row {
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+            font-size: 11px;
+            font-weight: bold;
+            border-bottom: 1px solid #222;
+            background: #e1e1e6;
+            color: #111;
+        }
+
+        .pr-key-row.black {
+            background: #222;
+            color: #fff;
+        }
+
+        .pr-grid-container {
+            flex-grow: 1;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .pr-grid-bars {
+            display: grid;
+            grid-template-columns: repeat(16, 60px); /* 4 bars x 4 beats */
+            position: relative;
+        }
+
+        .pr-row {
+            display: flex;
+            height: 28px;
+            border-bottom: 1px solid #1a1a22;
+        }
+
+        .pr-cell {
+            width: 60px;
+            height: 28px;
+            border-right: 1px solid #1a1a22;
+            border-bottom: 1px solid #1a1a22;
+            background: #121216;
+            cursor: pointer;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            color: #555;
+        }
+
+        .pr-cell:nth-child(4n) {
+            border-right: 2px solid #444; /* Bar separator */
+        }
+
+        .pr-cell.active {
+            background: #ff0055;
+            color: #fff;
+            border-color: #ff6699;
+            font-weight: bold;
+            box-shadow: inset 0 0 6px rgba(255,255,255,0.4);
+        }
+
+        .pr-cell.current-playhead {
+            background: #00ffcc !important;
+            color: #000 !important;
+        }
+
+        /* Master Mixer (14 Channels with Drum included & Pop-ups) */
+        .mixer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
+            gap: 8px;
+            max-height: 420px;
+            overflow-y: auto;
+        }
+
+        .channel-strip {
+            background: #18181d;
+            border: 1px solid #2a2a32;
+            padding: 8px;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            align-items: center;
+            text-align: center;
+        }
+
+        .channel-strip select {
+            font-size: 11px;
+            padding: 3px;
+            width: 100%;
+            background: #222;
+            color: #00ffcc;
+            border: 1px solid #444;
+            border-radius: 3px;
+        }
+
+        .channel-strip input[type="range"] {
+            writing-mode: bt-lr;
+            -webkit-appearance: slider-vertical;
+            width: 22px;
+            height: 90px;
+            background: #111;
+        }
+
+        .mixer-buttons {
+            display: flex;
+            gap: 3px;
+            width: 100%;
+        }
+
+        .mixer-buttons button {
+            flex: 1;
+            font-size: 10px;
+            padding: 3px;
+        }
+
+        .btn-mute.active { background: #ff4444; color: #fff; }
+        .btn-solo.active { background: #ffaa00; color: #000; }
+
+        @media (max-width: 600px) {
+            body { padding: 4px; }
+            .container { padding: 6px; }
+            .step-btn { width: 26px; height: 32px; }
+            .key { width: 38px; height: 100px; font-size: 11px; }
+            .key.black { width: 26px; height: 60px; margin-left: -13px; margin-right: -13px; font-size: 9px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>RetroBeat Groovebox Pro v4.1</h1>
+    <div class="subtitle">16-Step Drum Machine, Classic Keyboard & DAW Piano Roll, 14-Ch Mixer</div>
+
+    <!-- Master Controls -->
+    <div class="master-panel">
+        <div class="control-group">
+            <label>Master Play</label>
+            <button id="playBtn" class="btn-primary" onclick="togglePlay()">PLAY / STOP</button>
+        </div>
+        <div class="control-group">
+            <label>BPM: <span id="bpmVal">120</span></label>
+            <input type="range" id="bpmRange" min="60" max="180" value="120" oninput="updateBPM(this.value)">
+        </div>
+        <div class="control-group">
+            <label>Master Vol</label>
+            <input type="range" min="0" max="1" step="0.05" value="0.8" oninput="updateMasterVolume(this.value)">
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('drums')">1. Drum Sequencer</button>
+        <button class="tab-btn" onclick="switchTab('synth')">2. Multi-Synth & Keyboard</button>
+        <button class="tab-btn" onclick="switchTab('mixer')">3. Master Mixer (14 Ch)</button>
+        <button class="tab-btn" onclick="switchTab('fx')">4. FX & Routing</button>
+    </div>
+
+    <!-- TAB 1: DRUMS -->
+    <div id="tab-drums" class="tab-content active">
+        <div class="rack-section">
+            <div class="rack-header">
+                <span>10-Part Drum Machine (16 Steps + Volume Fader)</span>
+                <button style="font-size:11px; padding:3px 6px;" onclick="clearDrums()">Clear</button>
+            </div>
+            <div id="drumGridContainer"></div>
+        </div>
+    </div>
+
+    <!-- TAB 2: SYNTH & KEYBOARD -->
+    <div id="tab-synth" class="tab-content">
+        <div class="rack-section">
+            <div class="rack-header">
+                <span>Polyphonic Synth & DAW Piano Roll</span>
+                <button class="btn-primary" style="font-size:12px; padding:5px 12px;" onclick="openPianoRollModal()">🎹 Open Full Piano Roll (4 Bars)</button>
+            </div>
+            
+            <div class="synth-toolbar">
+                <div class="control-group" style="flex:1;">
+                    <label>Active Synth Track</label>
+                    <select id="activeSynthTrack" onchange="switchSynthTrack(this.value)">
+                        <option value="0">Track 1: Lead Melody</option>
+                        <option value="1">Track 2: Synth Bass</option>
+                        <option value="2">Track 3: Chords / Pad</option>
+                        <option value="3">Track 4: Arp / Pluck</option>
+                    </select>
+                </div>
+                <div class="control-group" style="justify-content:flex-end;">
+                    <label>&nbsp;</label>
+                    <button id="recMidiBtn" class="btn-primary" style="font-size:12px; padding:5px 10px;" onclick="toggleRecordMidi()">🔴 Rec MIDI: OFF</button>
+                </div>
+            </div>
+
+            <div class="synth-controls">
+                <div class="control-group">
+                    <label>Waveform</label>
+                    <select id="synthWave" onchange="updateSynthParam('wave', this.value)">
+                        <option value="sawtooth">Sawtooth</option>
+                        <option value="square">Square</option>
+                        <option value="sine">Sine</option>
+                        <option value="triangle">Triangle</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Filter Cutoff: <span id="cutoffVal">2000Hz</span></label>
+                    <input type="range" id="synthCutoff" min="200" max="10000" step="100" value="2000" oninput="updateSynthParam('cutoff', this.value)">
+                </div>
+                <div class="control-group">
+                    <label>Release: <span id="releaseVal">0.3s</span></label>
+                    <input type="range" id="synthRelease" min="0.05" max="2.0" step="0.05" value="0.3" oninput="updateSynthParam('release', this.value)">
+                </div>
+            </div>
+            
+            <!-- Classic On-Screen Keyboard (Large Version 1 Design) -->
+            <div class="keyboard-container">
+                <div class="keyboard" id="synthKeyboard"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 3: MIXER (14 Channels with Drum at Ch 1, Unassigned for others) -->
+    <div id="tab-mixer" class="tab-content">
+        <div class="rack-section">
+            <div class="rack-header"><span>Master Mixer (14 Assignable Channels - Ch 1 is Drum)</span></div>
+            <div class="mixer-grid" id="mixerGrid"></div>
+        </div>
+    </div>
+
+    <!-- TAB 4: FX & ROUTING -->
+    <div id="tab-fx" class="tab-content">
+        <div class="rack-section">
+            <div class="rack-header"><span>FX & Routing Rack</span></div>
+            <div style="font-size: 13px; color: #888; padding: 15px; text-align: center;">
+                ระบบ FX & Routing กำลังพัฒนาต่อในสเต็ปถัดไป
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- FULLSCREEN PIANO ROLL MODAL (DAW Style: 4 bars x 16 notes) -->
+<div class="modal-overlay" id="pianoRollModal">
+    <div class="piano-roll-modal">
+        <div class="pr-modal-header">
+            <h2>🎹 DAW Piano Roll - <span id="modalTrackTitle">Track 1: Lead Melody</span> (4 Bars / 16 Beats)</h2>
+            <div style="display:flex; gap:8px;">
+                <button style="font-size:12px; padding:5px 10px;" onclick="clearFullPianoRoll()">Clear Pattern</button>
+                <button class="btn-primary" style="font-size:12px; padding:5px 15px;" onclick="closePianoRollModal()">Save & Close ✖</button>
+            </div>
+        </div>
+        <div class="pr-workspace" id="prWorkspace">
+            <div class="pr-keys-col" id="prKeysCol"></div>
+            <div class="pr-grid-container" id="prGridContainer">
+                <div class="pr-grid-bars" id="prGridBars"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- AUDIO CONTEXT & SETUP ---
+    let audioCtx = null;
+    let masterGain = null;
+    let drumBus = null;
+    let synthBus = null;
+
+    let isPlaying = false;
+    let bpm = 120;
+    let currentStep = 0;
+    let timerId = null;
+    let isRecordingMidi = false;
+
+    // 10-Part Drum Tracks with inline volume
+    const drumTracks = [
+        { name: 'Kick', type: 'kick', volume: 0.8, muted: false, steps: Array(16).fill(false) },
+        { name: 'Snare', type: 'snare', volume: 0.8, muted: false, steps: Array(16).fill(false) },
+        { name: 'Clap', type: 'clap', volume: 0.7, muted: false, steps: Array(16).fill(false) },
+        { name: 'Rimshot', type: 'rim', volume: 0.7, muted: false, steps: Array(16).fill(false) },
+        { name: 'Closed HH', type: 'hihat', volume: 0.6, muted: false, steps: Array(16).fill(false) },
+        { name: 'Open HH', type: 'openhat', volume: 0.6, muted: false, steps: Array(16).fill(false) },
+        { name: 'Tom High', type: 'tomH', volume: 0.7, muted: false, steps: Array(16).fill(false) },
+        { name: 'Tom Mid', type: 'tomM', volume: 0.7, muted: false, steps: Array(16).fill(false) },
+        { name: 'Tom Low', type: 'tomL', volume: 0.7, muted: false, steps: Array(16).fill(false) },
+        { name: 'Crash', type: 'crash', volume: 0.8, muted: false, steps: Array(16).fill(false) }
+    ];
+
+    drumTracks[0].steps = [true, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false];
+    drumTracks[1].steps = [false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false];
+    drumTracks[4].steps = [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true];
+    drumTracks[5].steps = [false, false, true, false, false, false, true, false, false, false, true, false, false, false, true, false];
+
+    // Multi-Track Synth Data (4 Tracks)
+    let synthTracks = [
+        { name: 'Lead Melody', wave: 'sawtooth', cutoff: 3000, release: 0.3, volume: 0.8, muted: false, matrix: {} },
+        { name: 'Synth Bass', wave: 'square', cutoff: 1200, release: 0.2, volume: 0.9, muted: false, matrix: {} },
+        { name: 'Chords / Pad', wave: 'triangle', cutoff: 2000, release: 0.8, volume: 0.7, muted: false, matrix: {} },
+        { name: 'Arp / Pluck', wave: 'sawtooth', cutoff: 5000, release: 0.15, volume: 0.75, muted: false, matrix: {} }
+    ];
+    let currentSynthTrackIdx = 0;
+
+    // Full 2-Octave Notes for Piano Roll (C2 to C4)
+    const pianoRollNotes = [
+        { note: 'C4', freq: 261.63, type: 'white' },
+        { note: 'B3', freq: 246.94, type: 'white' },
+        { note: 'A#3', freq: 233.08, type: 'black' },
+        { note: 'A3', freq: 220.00, type: 'white' },
+        { note: 'G#3', freq: 207.65, type: 'black' },
+        { note: 'G3', freq: 196.00, type: 'white' },
+        { note: 'F#3', freq: 185.00, type: 'black' },
+        { note: 'F3', freq: 174.61, type: 'white' },
+        { note: 'E3', freq: 164.81, type: 'white' },
+        { note: 'D#3', freq: 155.56, type: 'black' },
+        { note: 'D3', freq: 146.83, type: 'white' },
+        { note: 'C#3', freq: 138.59, type: 'black' },
+        { note: 'C3', freq: 130.81, type: 'white' },
+        { note: 'B2', freq: 123.47, type: 'white' },
+        { note: 'A#2', freq: 116.54, type: 'black' },
+        { note: 'A2', freq: 110.00, type: 'white' },
+        { note: 'G#2', freq: 103.83, type: 'black' },
+        { note: 'G2', freq: 98.00, type: 'white' },
+        { note: 'F#2', freq: 92.50, type: 'black' },
+        { note: 'F2', freq: 87.31, type: 'white' },
+        { note: 'E2', freq: 82.41, type: 'white' },
+        { note: 'D#2', freq: 77.78, type: 'black' },
+        { note: 'D2', freq: 73.42, type: 'white' },
+        { note: 'C#2', freq: 69.30, type: 'black' },
+        { note: 'C2', freq: 65.41, type: 'white' }
+    ];
+
+    // 14 Mixer Channels (Channel 1 is Drum, Channel 3 is Synth Bass, others are Unassigned!)
+    const availableInstrumentOptions = [
+        "Unassigned", "Drum", "Synth Lead", "Synth Bass", "Synth Pad", "Arp Synth", 
+        "Sub Bass", "Electric Piano", "Strings", "Brass", "Vocals Loop", "FX Sound"
+    ];
+
+    let mixerChannels = Array.from({length: 14}, (_, i) => {
+        let defaultInst = "Unassigned";
+        if (i === 0) defaultInst = "Drum";
+        else if (i === 2) defaultInst = "Synth Bass"; // Channel 3 (index 2) as requested
+
+        return {
+            id: i + 1,
+            assignedInstrument: defaultInst,
+            volume: 0.8,
+            muted: false,
+            soloed: false
+        };
+    });
+
+    function initAudioContext() {
+        if (!audioCtx) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+
+            masterGain = audioCtx.createGain();
+            masterGain.gain.value = 0.8;
+
+            drumBus = audioCtx.createGain();
+            synthBus = audioCtx.createGain();
+
+            drumBus.connect(masterGain);
+            synthBus.connect(masterGain);
+            masterGain.connect(audioCtx.destination);
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    }
+
+    // --- DRUM MACHINE UI & SYNTHESIS ---
+    function renderDrumGrid() {
+        const container = document.getElementById('drumGridContainer');
+        container.innerHTML = '';
+
+        drumTracks.forEach((track, tIdx) => {
+            const row = document.createElement('div');
+            row.className = 'track-row';
+
+            const label = document.createElement('div');
+            label.className = 'track-label';
+            label.textContent = track.name;
+            row.appendChild(label);
+
+            track.steps.forEach((active, sIdx) => {
+                const btn = document.createElement('button');
+                btn.className = 'step-btn' + (active ? ' active' : '');
+                btn.id = `drum-${tIdx}-${sIdx}`;
+                btn.textContent = sIdx + 1;
+                btn.onclick = () => {
+                    track.steps[sIdx] = !track.steps[sIdx];
+                    btn.classList.toggle('active');
+                };
+                row.appendChild(btn);
+            });
+
+            const volSlider = document.createElement('input');
+            volSlider.type = 'range';
+            volSlider.min = '0';
+            volSlider.max = '1';
+            volSlider.step = '0.05';
+            volSlider.value = track.volume;
+            volSlider.className = 'drum-vol-slider';
+            volSlider.title = `Volume: ${Math.round(track.volume * 100)}%`;
+            volSlider.oninput = (e) => {
+                track.volume = parseFloat(e.target.value);
+            };
+            row.appendChild(volSlider);
+
+            container.appendChild(row);
+        });
+    }
+
+    function clearDrums() {
+        drumTracks.forEach(track => track.steps.fill(false));
+        renderDrumGrid();
+    }
+
+    function playDrumSound(type, volume) {
+        initAudioContext();
+        const t = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        
+        // Find if any channel is assigned to Drum and use its volume/mute state
+        let drumVol = 0.8;
+        let drumMuted = false;
+        mixerChannels.forEach(ch => {
+            if (ch.assignedInstrument === "Drum") {
+                drumVol = ch.volume;
+                drumMuted = ch.muted;
+            }
+        });
+
+        if (drumMuted) return;
+        const effectiveVol = volume * 0.7 * drumVol;
+
+        if (type === 'kick') {
+            osc.frequency.setValueAtTime(140, t);
+            osc.frequency.exponentialRampToValueAtTime(35, t + 0.15);
+            gain.gain.setValueAtTime(effectiveVol, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
+            osc.connect(gain);
+            gain.connect(drumBus);
+            osc.start(t);
+            osc.stop(t + 0.2);
+        } else {
+            let dur = 0.15;
+            if (type === 'openhat') dur = 0.3;
+            if (type === 'crash') dur = 0.8;
+            if (type === 'tomH') { playTom(300, effectiveVol, t); return; }
+            if (type === 'tomM') { playTom(200, effectiveVol, t); return; }
+            if (type === 'tomL') { playTom(110, effectiveVol, t); return; }
+
+            const bufferSize = audioCtx.sampleRate * dur;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+
+            const noise = audioCtx.createBufferSource();
+            noise.buffer = buffer;
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = type === 'hihat' || type === 'openhat' ? 'highpass' : 'bandpass';
+            filter.frequency.value = type === 'hihat' ? 6000 : 1200;
+
+            gain.gain.setValueAtTime(effectiveVol, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
+
+            noise.connect(filter);
+            filter.connect(gain);
+            gain.connect(drumBus);
+            noise.start(t);
+        }
+    }
+
+    function playTom(freq, vol, t) {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.frequency.setValueAtTime(freq, t);
+        osc.frequency.exponentialRampToValueAtTime(freq * 0.5, t + 0.2);
+        gain.gain.setValueAtTime(vol, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+        osc.connect(gain);
+        gain.connect(drumBus);
+        osc.start(t);
+        osc.stop(t + 0.25);
+    }
+
+    // --- CLASSIC KEYBOARD (Version 1 Design) ---
+    const version1Keys = [
+        { note: 'C3', freq: 130.81, type: 'white' },
+        { note: 'C#3', freq: 138.59, type: 'black' },
+        { note: 'D3', freq: 146.83, type: 'white' },
+        { note: 'D#3', freq: 155.56, type: 'black' },
+        { note: 'E3', freq: 164.81, type: 'white' },
+        { note: 'F3', freq: 174.61, type: 'white' },
+        { note: 'F#3', freq: 185.00, type: 'black' },
+        { note: 'G3', freq: 196.00, type: 'white' },
+        { note: 'G#3', freq: 207.65, type: 'black' },
+        { note: 'A3', freq: 220.00, type: 'white' },
+        { note: 'A#3', freq: 233.08, type: 'black' },
+        { note: 'B3', freq: 246.94, type: 'white' },
+        { note: 'C4', freq: 261.63, type: 'white' }
+    ];
+
+    function renderKeyboard() {
+        const kb = document.getElementById('synthKeyboard');
+        kb.innerHTML = '';
+        version1Keys.forEach(k => {
+            const el = document.createElement('div');
+            el.className = `key ${k.type === 'black' ? 'black' : ''}`;
+            el.textContent = k.note;
+            el.id = `key-${k.note}`;
+            el.onmousedown = () => {
+                handleKeyPress(k, el);
+            };
+            kb.appendChild(el);
+        });
+    }
+
+    function handleKeyPress(k, element) {
+        playSynthNote(k.freq, element);
+
+        if (isRecordingMidi) {
+            const track = synthTracks[currentSynthTrackIdx];
+            track.matrix[currentStep] = k.note;
+        }
+    }
+
+    function playSynthNote(freq, element) {
+        initAudioContext();
+        if (element) {
+            element.classList.add('active-key');
+            setTimeout(() => element.classList.remove('active-key'), 200);
+        }
+
+        const track = synthTracks[currentSynthTrackIdx];
+        const t = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const filter = audioCtx.createBiquadFilter();
+        const gain = audioCtx.createGain();
+
+        osc.type = track.wave;
+        osc.frequency.setValueAtTime(freq, t);
+
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(track.cutoff, t);
+
+        const release = parseFloat(track.release);
+        const vol = track.volume * 0.5;
+        gain.gain.setValueAtTime(vol, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + release);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(synthBus);
+
+        osc.start(t);
+        osc.stop(t + release);
+    }
+
+    function switchSynthTrack(idx) {
+        currentSynthTrackIdx = parseInt(idx);
+        const track = synthTracks[currentSynthTrackIdx];
+        document.getElementById('synthWave').value = track.wave;
+        document.getElementById('synthCutoff').value = track.cutoff;
+        document.getElementById('cutoffVal').textContent = track.cutoff + 'Hz';
+        document.getElementById('synthRelease').value = track.release;
+        document.getElementById('releaseVal').textContent = track.release + 's';
+    }
+
+    function updateSynthParam(param, val) {
+        const track = synthTracks[currentSynthTrackIdx];
+        if (param === 'wave') track.wave = val;
+        if (param === 'cutoff') {
+            track.cutoff = parseFloat(val);
+            document.getElementById('cutoffVal').textContent = val + 'Hz';
+        }
+        if (param === 'release') {
+            track.release = parseFloat(val);
+            document.getElementById('releaseVal').textContent = val + 's';
+        }
+    }
+
+    function toggleRecordMidi() {
+        isRecordingMidi = !isRecordingMidi;
+        const btn = document.getElementById('recMidiBtn');
+        if (isRecordingMidi) {
+            btn.textContent = "🔴 Rec MIDI: ON";
+            btn.classList.add('active');
+        } else {
+            btn.textContent = "🔴 Rec MIDI: OFF";
+            btn.classList.remove('active');
+        }
+    }
+
+    // --- FULLSCREEN PIANO ROLL MODAL (DAW Style) ---
+    function openPianoRollModal() {
+        const track = synthTracks[currentSynthTrackIdx];
+        document.getElementById('modalTrackTitle').textContent = `Track ${currentSynthTrackIdx+1}: ${track.name}`;
+        buildPianoRollWorkspace();
+        document.getElementById('pianoRollModal').classList.add('active');
+    }
+
+    function closePianoRollModal() {
+        document.getElementById('pianoRollModal').classList.remove('active');
+    }
+
+    function buildPianoRollWorkspace() {
+        const keysCol = document.getElementById('prKeysCol');
+        const gridBars = document.getElementById('prGridBars');
+        keysCol.innerHTML = '';
+        gridBars.innerHTML = '';
+
+        const track = synthTracks[currentSynthTrackIdx];
+
+        pianoRollNotes.forEach(k => {
+            const keyRow = document.createElement('div');
+            keyRow.className = `pr-key-row ${k.type === 'black' ? 'black' : ''}`;
+            keyRow.textContent = k.note;
+            keysCol.appendChild(keyRow);
+        });
+
+        pianoRollNotes.forEach((k, kIdx) => {
+            const row = document.createElement('div');
+            row.className = 'pr-row';
+            row.dataset.note = k.note;
+
+            for (let step = 0; step < 16; step++) {
+                const cell = document.createElement('div');
+                cell.className = 'pr-cell';
+                cell.dataset.note = k.note;
+                cell.dataset.step = step;
+                cell.id = `pr-cell-${kIdx}-${step}`;
+
+                if (track.matrix[step] === k.note) {
+                    cell.classList.add('active');
+                    cell.textContent = k.note;
+                } else {
+                    cell.textContent = '';
+                }
+
+                cell.onclick = () => {
+                    if (track.matrix[step] === k.note) {
+                        delete track.matrix[step];
+                        cell.classList.remove('active');
+                        cell.textContent = '';
+                    } else {
+                        track.matrix[step] = k.note;
+                        for (let otherK = 0; otherK < pianoRollNotes.length; otherK++) {
+                            const otherCell = document.getElementById(`pr-cell-${otherK}-${step}`);
+                            if (otherCell) {
+                                otherCell.classList.remove('active');
+                                otherCell.textContent = '';
+                            }
+                        }
+                        cell.classList.add('active');
+                        cell.textContent = k.note;
+                        playSynthNote(k.freq);
+                    }
+                };
+                row.appendChild(cell);
+            }
+            gridBars.appendChild(row);
+        });
+    }
+
+    function clearFullPianoRoll() {
+        synthTracks[currentSynthTrackIdx].matrix = {};
+        buildPianoRollWorkspace();
+    }
+
+    // --- MASTER MIXER ---
+    function renderMixer() {
+        const grid = document.getElementById('mixerGrid');
+        grid.innerHTML = '';
+
+        mixerChannels.forEach((ch, idx) => {
+            const strip = document.createElement('div');
+            strip.className = 'channel-strip';
+
+            let optionsHTML = availableInstrumentOptions.map(opt => 
+                `<option value="${opt}" ${ch.assignedInstrument === opt ? 'selected' : ''}>${opt}</option>`
+            ).join('');
+
+            strip.innerHTML = `
+                <span style="font-size:10px; color:#ff0055; font-weight:bold;">CH ${ch.id}</span>
+                <select onchange="updateChannelInstrument(${idx}, this.value)">
+                    ${optionsHTML}
+                </select>
+                <input type="range" min="0" max="1" step="0.05" value="${ch.volume}" oninput="updateMixerVolume(${idx}, this.value)">
+                <div class="mixer-buttons">
+                    <button class="btn-mute ${ch.muted ? 'active' : ''}" onclick="toggleMixerMute(${idx}, this)">M</button>
+                    <button class="btn-solo ${ch.soloed ? 'active' : ''}" onclick="toggleMixerSolo(${idx}, this)">S</button>
+                </div>
+            `;
+            grid.appendChild(strip);
+        });
+    }
+
+    function updateChannelInstrument(idx, val) {
+        mixerChannels[idx].assignedInstrument = val;
+    }
+
+    function updateMixerVolume(idx, val) {
+        mixerChannels[idx].volume = parseFloat(val);
+    }
+
+    function toggleMixerMute(idx, btn) {
+        mixerChannels[idx].muted = !mixerChannels[idx].muted;
+        btn.classList.toggle('active', mixerChannels[idx].muted);
+    }
+
+    function toggleMixerSolo(idx, btn) {
+        mixerChannels[idx].soloed = !mixerChannels[idx].soloed;
+        btn.classList.toggle('active', mixerChannels[idx].soloed);
+    }
+
+    // --- SCHEDULER ---
+    function togglePlay() {
+        initAudioContext();
+        isPlaying = !isPlaying;
+        const btn = document.getElementById('playBtn');
+        if (isPlaying) {
+            btn.classList.add('active');
+            currentStep = 0;
+            startScheduler();
+        } else {
+            btn.classList.remove('active');
+            clearInterval(timerId);
+        }
+    }
+
+    function startScheduler() {
+        const interval = (60 / bpm / 4) * 1000;
+        clearInterval(timerId);
+        timerId = setInterval(() => {
+            // Play drums
+            drumTracks.forEach((track) => {
+                if (track.steps[currentStep]) {
+                    playDrumSound(track.type, track.volume);
+                }
+            });
+
+            // Play synth tracks from matrix
+            synthTracks.forEach((track, stIdx) => {
+                const noteName = track.matrix[currentStep];
+                if (noteName) {
+                    const foundNote = pianoRollNotes.find(n => n.note === noteName);
+                    if (foundNote) {
+                        if (stIdx === currentSynthTrackIdx) {
+                            playSynthNote(foundNote.freq, document.getElementById(`key-${foundNote.note}`));
+                        } else {
+                            playSynthNoteQuiet(foundNote.freq, track);
+                        }
+                    }
+                }
+            });
+
+            // UI step indicator update on drum grid
+            for (let t = 0; t < 10; t++) {
+                for (let s = 0; s < 16; s++) {
+                    const el = document.getElementById(`drum-${t}-${s}`);
+                    if (el) {
+                        el.style.borderColor = (s === currentStep) ? '#ff0055' : '#333';
+                    }
+                }
+            }
+
+            // UI step indicator update on modal piano roll if open
+            for (let kIdx = 0; kIdx < pianoRollNotes.length; kIdx++) {
+                for (let s = 0; s < 16; s++) {
+                    const cell = document.getElementById(`pr-cell-${kIdx}-${s}`);
+                    if (cell) {
+                        if (s === currentStep) {
+                            cell.style.borderLeft = '2px solid #00ffcc';
+                        } else {
+                            cell.style.borderLeft = '1px solid #1a1a22';
+                        }
+                    }
+                }
+            }
+
+            currentStep = (currentStep + 1) % 16;
+        }, interval);
+    }
+
+    function playSynthNoteQuiet(freq, track) {
+        const t = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const filter = audioCtx.createBiquadFilter();
+        const gain = audioCtx.createGain();
+
+        osc.type = track.wave;
+        osc.frequency.setValueAtTime(freq, t);
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(track.cutoff, t);
+
+        const release = track.release;
+        gain.gain.setValueAtTime(track.volume * 0.5, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + release);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(synthBus);
+
+        osc.start(t);
+        osc.stop(t + release);
+    }
+
+    function updateBPM(val) {
+        bpm = parseInt(val);
+        document.getElementById('bpmVal').textContent = bpm;
+        if (isPlaying) startScheduler();
+    }
+
+    function updateMasterVolume(val) {
+        if (masterGain) masterGain.gain.setValueAtTime(parseFloat(val), audioCtx.currentTime);
+    }
+
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        
+        if (tabName === 'drums') {
+            document.getElementById('tab-drums').classList.add('active');
+            event.target.classList.add('active');
+        } else if (tabName === 'synth') {
+            document.getElementById('tab-synth').classList.add('active');
+            event.target.classList.add('active');
+        } else if (tabName === 'mixer') {
+            document.getElementById('tab-mixer').classList.add('active');
+            event.target.classList.add('active');
+            renderMixer();
+        } else if (tabName === 'fx') {
+            document.getElementById('tab-fx').classList.add('active');
+            event.target.classList.add('app-active') || document.getElementById('tab-fx').classList.add('active');
+            event.target.classList.add('active');
+        }
+    }
+
+    // Initial render
+    renderDrumGrid();
+    renderKeyboard();
+    renderMixer();
+</script>
+
+</body>
+</html>

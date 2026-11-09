@@ -3,8 +3,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>RetroBeat Groovebox Pro - PWA v4.1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RetroBeat Groovebox Pro - v5</title>
     <style>
         * {
             box-sizing: border-box;
@@ -12,6 +12,7 @@
             padding: 0;
             user-select: none;
             -webkit-user-select: none;
+            -webkit-touch-callout: none;
         }
 
         body {
@@ -20,6 +21,8 @@
             font-family: 'Courier New', Courier, monospace;
             padding: 8px;
             font-size: 15px;
+            overflow-x: hidden;
+            touch-action: manipulation;
         }
 
         h1 {
@@ -48,7 +51,7 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
 
-        /* Master Transport */
+        /* Master Transport & Section Display */
         .master-panel {
             display: flex;
             flex-wrap: wrap;
@@ -104,6 +107,24 @@
             background: #ff0055;
             color: #fff;
             box-shadow: 0 0 10px #ff0055;
+        }
+
+        .section-display {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #18181d;
+            border: 1px solid #333;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .section-display span {
+            font-size: 16px;
+            font-weight: bold;
+            color: #00ffcc;
+            font-family: monospace;
+            letter-spacing: 1px;
         }
 
         /* Tabs */
@@ -218,7 +239,7 @@
             cursor: pointer;
         }
 
-        /* Synth Rack */
+        /* Synth Rack & Keyboard */
         .synth-toolbar {
             display: flex;
             flex-wrap: wrap;
@@ -238,7 +259,7 @@
             margin-bottom: 8px;
         }
 
-        /* Classic Keyboard Layout (Version 1 style) - Large iPad touch friendly */
+        /* Fixed Keyboard Container with Octave Shift */
         .keyboard-container {
             position: relative;
             overflow-x: auto;
@@ -249,51 +270,70 @@
             margin-bottom: 10px;
         }
 
+        .keyboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px 6px 10px;
+            font-size: 12px;
+            color: #00ffcc;
+        }
+
         .keyboard {
             display: flex;
             position: relative;
-            height: 130px;
-            min-width: 650px;
+            height: 140px;
+            min-width: 1300px;
             margin: 0 auto;
             justify-content: center;
         }
 
-        .key {
-            width: 48px;
-            height: 120px;
+        .key-white {
+            width: 44px;
+            height: 130px;
             background: #f0f0f5;
-            color: #111;
-            border-radius: 0 0 6px 6px;
+            color: #222;
+            border: 1px solid #999;
+            border-radius: 0 0 5px 5px;
             display: flex;
             align-items: flex-end;
             justify-content: center;
-            padding-bottom: 10px;
+            padding-bottom: 8px;
             font-weight: bold;
-            font-size: 13px;
+            font-size: 11px;
             cursor: pointer;
-            flex-shrink: 0;
-            border: 1px solid #ccc;
             z-index: 1;
+            flex-shrink: 0;
         }
 
-        .key.black {
-            background: #222;
-            color: #fff;
-            width: 32px;
-            height: 75px;
-            margin-left: -16px;
-            margin-right: -16px;
-            z-index: 3;
-            border: 1px solid #000;
-            border-radius: 0 0 4px 4px;
-        }
-
-        .key:active, .key.active-key {
+        .key-white:active, .key-white.active-key {
             background: #ff0055 !important;
             color: #fff !important;
         }
 
-        /* Fullscreen Modal Piano Roll (DAW style with 4 bars x 4 beats) */
+        .key-black {
+            position: absolute;
+            width: 28px;
+            height: 80px;
+            background: #222;
+            color: #fff;
+            border: 1px solid #000;
+            border-radius: 0 0 4px 4px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 6px;
+            font-weight: bold;
+            font-size: 9px;
+            cursor: pointer;
+            z-index: 3;
+        }
+
+        .key-black:active, .key-black.active-key {
+            background: #ff0055 !important;
+        }
+
+        /* Fullscreen Piano Roll Modal (Exact Match to User Reference) */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -305,7 +345,7 @@
             z-index: 1000;
             justify-content: center;
             align-items: center;
-            padding: 15px;
+            padding: 10px;
         }
 
         .modal-overlay.active {
@@ -317,11 +357,11 @@
             border: 2px solid #00ffcc;
             border-radius: 8px;
             width: 100%;
-            max-width: 1000px;
-            max-height: 90vh;
+            max-width: 1100px;
+            max-height: 95vh;
             display: flex;
             flex-direction: column;
-            padding: 15px;
+            padding: 12px;
             box-shadow: 0 15px 40px rgba(0,0,0,0.9);
         }
 
@@ -329,48 +369,51 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             border-bottom: 1px solid #222;
-            padding-bottom: 8px;
+            padding-bottom: 6px;
         }
 
         .pr-modal-header h2 {
-            font-size: 15px;
+            font-size: 14px;
             color: #00ffcc;
         }
 
         .pr-workspace {
             display: flex;
             overflow-y: auto;
-            max-height: 65vh;
+            max-height: 70vh;
             background: #0a0a0d;
             border: 1px solid #222;
             border-radius: 4px;
         }
 
         .pr-keys-col {
-            width: 80px;
+            width: 75px;
             flex-shrink: 0;
-            background: #111;
+            background: #1a1a20;
             border-right: 2px solid #333;
+            display: flex;
+            flex-direction: column;
         }
 
         .pr-key-row {
-            height: 28px;
+            height: 26px;
             display: flex;
             align-items: center;
             justify-content: flex-end;
             padding-right: 8px;
             font-size: 11px;
             font-weight: bold;
-            border-bottom: 1px solid #222;
-            background: #e1e1e6;
+            border-bottom: 1px solid #ccc;
+            background: #f0f0f5;
             color: #111;
         }
 
         .pr-key-row.black {
             background: #222;
             color: #fff;
+            border-bottom: 1px solid #111;
         }
 
         .pr-grid-container {
@@ -381,49 +424,44 @@
 
         .pr-grid-bars {
             display: grid;
-            grid-template-columns: repeat(16, 60px); /* 4 bars x 4 beats */
+            grid-template-columns: repeat(16, 45px); /* 16 beats with 4 bar separation */
             position: relative;
         }
 
         .pr-row {
             display: flex;
-            height: 28px;
-            border-bottom: 1px solid #1a1a22;
+            height: 26px;
+            border-bottom: 1px solid #333;
         }
 
         .pr-cell {
-            width: 60px;
-            height: 28px;
-            border-right: 1px solid #1a1a22;
-            border-bottom: 1px solid #1a1a22;
-            background: #121216;
+            width: 45px;
+            height: 26px;
+            border-right: 1px solid #333;
+            border-bottom: 1px solid #333;
+            background: #ffffff; /* White background for default beats matching image */
             cursor: pointer;
             box-sizing: border-box;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 9px;
-            color: #555;
         }
 
-        .pr-cell:nth-child(4n) {
-            border-right: 2px solid #444; /* Bar separator */
+        /* 4-bar grouping shading matching user reference image (Bars 1, 3 white; Bars 2, 4 grey or alternating bars) */
+        /* Columns 1-4 (Bar 1): white, 5-8 (Bar 2): grey, 9-12 (Bar 3): white, 13-16 (Bar 4): grey */
+        .pr-cell:nth-child(n+5):nth-child(-n+8),
+        .pr-cell:nth-child(n+13):nth-child(-n+16) {
+            background: #d0d0d8; /* Light grey bar background matching reference image */
         }
 
         .pr-cell.active {
-            background: #ff0055;
-            color: #fff;
-            border-color: #ff6699;
-            font-weight: bold;
-            box-shadow: inset 0 0 6px rgba(255,255,255,0.4);
+            background: #55ff33 !important; /* Vivid green matching reference image */
+            border-color: #22aa11;
+            box-shadow: inset 0 0 4px rgba(0,0,0,0.3);
         }
 
         .pr-cell.current-playhead {
-            background: #00ffcc !important;
-            color: #000 !important;
+            border-left: 2px solid #00ffcc !important;
         }
 
-        /* Master Mixer (14 Channels with Drum included & Pop-ups) */
+        /* Master Mixer */
         .mixer-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
@@ -481,22 +519,27 @@
             body { padding: 4px; }
             .container { padding: 6px; }
             .step-btn { width: 26px; height: 32px; }
-            .key { width: 38px; height: 100px; font-size: 11px; }
-            .key.black { width: 26px; height: 60px; margin-left: -13px; margin-right: -13px; font-size: 9px; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>RetroBeat Groovebox Pro v4.1</h1>
-    <div class="subtitle">16-Step Drum Machine, Classic Keyboard & DAW Piano Roll, 14-Ch Mixer</div>
+    <h1>RetroBeat Groovebox Pro v5</h1>
+    <div class="subtitle">TR-909 Drums, TR-303 Acid Bass, Multi-Octave Keyboard & DAW Piano Roll</div>
 
-    <!-- Master Controls -->
+    <!-- Master Controls & Section Display -->
     <div class="master-panel">
         <div class="control-group">
             <label>Master Play</label>
             <button id="playBtn" class="btn-primary" onclick="togglePlay()">PLAY / STOP</button>
+        </div>
+        <div class="control-group">
+            <label>Section (4 Bars)</label>
+            <div class="section-display">
+                <span id="currentSectionDisplay">001</span>
+                <button style="padding: 2px 6px; font-size:12px;" onclick="addSection()">+</button>
+            </div>
         </div>
         <div class="control-group">
             <label>BPM: <span id="bpmVal">120</span></label>
@@ -510,17 +553,17 @@
 
     <!-- Tabs -->
     <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('drums')">1. Drum Sequencer</button>
-        <button class="tab-btn" onclick="switchTab('synth')">2. Multi-Synth & Keyboard</button>
+        <button class="tab-btn active" onclick="switchTab('drums')">1. TR-909 Drums</button>
+        <button class="tab-btn" onclick="switchTab('synth')">2. TR-303 Synth & Keyboard</button>
         <button class="tab-btn" onclick="switchTab('mixer')">3. Master Mixer (14 Ch)</button>
         <button class="tab-btn" onclick="switchTab('fx')">4. FX & Routing</button>
     </div>
 
-    <!-- TAB 1: DRUMS -->
+    <!-- TAB 1: TR-909 DRUMS -->
     <div id="tab-drums" class="tab-content active">
         <div class="rack-section">
             <div class="rack-header">
-                <span>10-Part Drum Machine (16 Steps + Volume Fader)</span>
+                <span>TR-909 Drum Machine (16 Steps + Volume Fader)</span>
                 <button style="font-size:11px; padding:3px 6px;" onclick="clearDrums()">Clear</button>
             </div>
             <div id="drumGridContainer"></div>
@@ -531,16 +574,16 @@
     <div id="tab-synth" class="tab-content">
         <div class="rack-section">
             <div class="rack-header">
-                <span>Polyphonic Synth & DAW Piano Roll</span>
-                <button class="btn-primary" style="font-size:12px; padding:5px 12px;" onclick="openPianoRollModal()">🎹 Open Full Piano Roll (4 Bars)</button>
+                <span>TR-303 Synth & DAW Piano Roll</span>
+                <button class="btn-primary" style="font-size:12px; padding:5px 12px;" onclick="openPianoRollModal()">🎹 Open DAW Piano Roll</button>
             </div>
             
             <div class="synth-toolbar">
                 <div class="control-group" style="flex:1;">
                     <label>Active Synth Track</label>
                     <select id="activeSynthTrack" onchange="switchSynthTrack(this.value)">
-                        <option value="0">Track 1: Lead Melody</option>
-                        <option value="1">Track 2: Synth Bass</option>
+                        <option value="0">Track 1: TR-303 Acid Bass</option>
+                        <option value="1">Track 2: Lead Melody</option>
                         <option value="2">Track 3: Chords / Pad</option>
                         <option value="3">Track 4: Arp / Pluck</option>
                     </select>
@@ -555,9 +598,9 @@
                 <div class="control-group">
                     <label>Waveform</label>
                     <select id="synthWave" onchange="updateSynthParam('wave', this.value)">
-                        <option value="sawtooth">Sawtooth</option>
-                        <option value="square">Square</option>
-                        <option value="sine">Sine</option>
+                        <option value="sawtooth">Sawtooth (TR-303)</option>
+                        <option value="square">Square (Acid)</option>
+                        <option value="sine">Sine (Sub)</option>
                         <option value="triangle">Triangle</option>
                     </select>
                 </div>
@@ -571,17 +614,26 @@
                 </div>
             </div>
             
-            <!-- Classic On-Screen Keyboard (Large Version 1 Design) -->
+            <!-- Multi-Octave Keyboard with Octave Shift -->
             <div class="keyboard-container">
-                <div class="keyboard" id="synthKeyboard"></div>
+                <div class="keyboard-header">
+                    <span>2-Octave Touch Keyboard (<span id="currentOctaveLabel">Octave: C3 - C5</span>)</span>
+                    <div style="display:flex; gap:5px;">
+                        <button style="padding:2px 8px; font-size:12px;" onclick="shiftOctave(-1)">- Octave</button>
+                        <button style="padding:2px 8px; font-size:12px;" onclick="shiftOctave(1)">+ Octave</button>
+                    </div>
+                </div>
+                <div style="overflow-x: auto;">
+                    <div class="keyboard" id="synthKeyboard"></div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- TAB 3: MIXER (14 Channels with Drum at Ch 1, Unassigned for others) -->
+    <!-- TAB 3: MIXER -->
     <div id="tab-mixer" class="tab-content">
         <div class="rack-section">
-            <div class="rack-header"><span>Master Mixer (14 Assignable Channels - Ch 1 is Drum)</span></div>
+            <div class="rack-header"><span>Master Mixer (14 Assignable Channels - Ch 1 is TR-909 Drums)</span></div>
             <div class="mixer-grid" id="mixerGrid"></div>
         </div>
     </div>
@@ -591,18 +643,18 @@
         <div class="rack-section">
             <div class="rack-header"><span>FX & Routing Rack</span></div>
             <div style="font-size: 13px; color: #888; padding: 15px; text-align: center;">
-                ระบบ FX & Routing กำลังพัฒนาต่อในสเต็ปถัดไป
+                ระบบ FX & Routing (Distortion / Delay / Reverb) กำลังเชื่อมต่อเข้ากับแชนเนลสตรีม
             </div>
         </div>
     </div>
 
 </div>
 
-<!-- FULLSCREEN PIANO ROLL MODAL (DAW Style: 4 bars x 16 notes) -->
+<!-- FULLSCREEN PIANO ROLL MODAL (Exact match to user reference image) -->
 <div class="modal-overlay" id="pianoRollModal">
     <div class="piano-roll-modal">
         <div class="pr-modal-header">
-            <h2>🎹 DAW Piano Roll - <span id="modalTrackTitle">Track 1: Lead Melody</span> (4 Bars / 16 Beats)</h2>
+            <h2>🎹 DAW Piano Roll - <span id="modalTrackTitle">Track 1: TR-303 Acid Bass</span> (4 Bars / 16 Beats)</h2>
             <div style="display:flex; gap:8px;">
                 <button style="font-size:12px; padding:5px 10px;" onclick="clearFullPianoRoll()">Clear Pattern</button>
                 <button class="btn-primary" style="font-size:12px; padding:5px 15px;" onclick="closePianoRollModal()">Save & Close ✖</button>
@@ -627,21 +679,24 @@
     let isPlaying = false;
     let bpm = 120;
     let currentStep = 0;
+    let currentSection = 1;
+    let totalSections = 1;
     let timerId = null;
     let isRecordingMidi = false;
+    let baseOctave = 3; // C3 start
 
-    // 10-Part Drum Tracks with inline volume
+    // TR-909 Drum Tracks with custom synthesis emulation
     const drumTracks = [
-        { name: 'Kick', type: 'kick', volume: 0.8, muted: false, steps: Array(16).fill(false) },
-        { name: 'Snare', type: 'snare', volume: 0.8, muted: false, steps: Array(16).fill(false) },
-        { name: 'Clap', type: 'clap', volume: 0.7, muted: false, steps: Array(16).fill(false) },
+        { name: 'TR-909 Kick', type: 'kick', volume: 0.8, muted: false, steps: Array(16).fill(false) },
+        { name: 'TR-909 Snare', type: 'snare', volume: 0.8, muted: false, steps: Array(16).fill(false) },
+        { name: 'TR-909 Clap', type: 'clap', volume: 0.7, muted: false, steps: Array(16).fill(false) },
         { name: 'Rimshot', type: 'rim', volume: 0.7, muted: false, steps: Array(16).fill(false) },
         { name: 'Closed HH', type: 'hihat', volume: 0.6, muted: false, steps: Array(16).fill(false) },
         { name: 'Open HH', type: 'openhat', volume: 0.6, muted: false, steps: Array(16).fill(false) },
         { name: 'Tom High', type: 'tomH', volume: 0.7, muted: false, steps: Array(16).fill(false) },
         { name: 'Tom Mid', type: 'tomM', volume: 0.7, muted: false, steps: Array(16).fill(false) },
         { name: 'Tom Low', type: 'tomL', volume: 0.7, muted: false, steps: Array(16).fill(false) },
-        { name: 'Crash', type: 'crash', volume: 0.8, muted: false, steps: Array(16).fill(false) }
+        { name: 'Crash Cymbal', type: 'crash', volume: 0.8, muted: false, steps: Array(16).fill(false) }
     ];
 
     drumTracks[0].steps = [true, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false];
@@ -649,16 +704,16 @@
     drumTracks[4].steps = [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true];
     drumTracks[5].steps = [false, false, true, false, false, false, true, false, false, false, true, false, false, false, true, false];
 
-    // Multi-Track Synth Data (4 Tracks)
+    // Multi-Track Synth Data (Track 1 is TR-303 Acid Bass)
     let synthTracks = [
+        { name: 'TR-303 Acid Bass', wave: 'sawtooth', cutoff: 2200, release: 0.25, volume: 0.9, muted: false, matrix: {} },
         { name: 'Lead Melody', wave: 'sawtooth', cutoff: 3000, release: 0.3, volume: 0.8, muted: false, matrix: {} },
-        { name: 'Synth Bass', wave: 'square', cutoff: 1200, release: 0.2, volume: 0.9, muted: false, matrix: {} },
         { name: 'Chords / Pad', wave: 'triangle', cutoff: 2000, release: 0.8, volume: 0.7, muted: false, matrix: {} },
         { name: 'Arp / Pluck', wave: 'sawtooth', cutoff: 5000, release: 0.15, volume: 0.75, muted: false, matrix: {} }
     ];
     let currentSynthTrackIdx = 0;
 
-    // Full 2-Octave Notes for Piano Roll (C2 to C4)
+    // 17 Piano Roll Notes matching user reference image (C2 to C4 range for clean vertical layout)
     const pianoRollNotes = [
         { note: 'C4', freq: 261.63, type: 'white' },
         { note: 'B3', freq: 246.94, type: 'white' },
@@ -676,27 +731,19 @@
         { note: 'B2', freq: 123.47, type: 'white' },
         { note: 'A#2', freq: 116.54, type: 'black' },
         { note: 'A2', freq: 110.00, type: 'white' },
-        { note: 'G#2', freq: 103.83, type: 'black' },
-        { note: 'G2', freq: 98.00, type: 'white' },
-        { note: 'F#2', freq: 92.50, type: 'black' },
-        { note: 'F2', freq: 87.31, type: 'white' },
-        { note: 'E2', freq: 82.41, type: 'white' },
-        { note: 'D#2', freq: 77.78, type: 'black' },
-        { note: 'D2', freq: 73.42, type: 'white' },
-        { note: 'C#2', freq: 69.30, type: 'black' },
         { note: 'C2', freq: 65.41, type: 'white' }
     ];
 
-    // 14 Mixer Channels (Channel 1 is Drum, Channel 3 is Synth Bass, others are Unassigned!)
+    // 14 Mixer Channels (Ch 1 = TR-909 Drums, Ch 3 = TR-303 Acid Bass)
     const availableInstrumentOptions = [
-        "Unassigned", "Drum", "Synth Lead", "Synth Bass", "Synth Pad", "Arp Synth", 
-        "Sub Bass", "Electric Piano", "Strings", "Brass", "Vocals Loop", "FX Sound"
+        "Unassigned", "TR-909 Drums", "TR-303 Acid Bass", "Synth Lead", "Synth Pad", 
+        "Arp Synth", "Sub Bass", "Electric Piano", "Strings", "Brass", "Vocals Loop", "FX Sound"
     ];
 
     let mixerChannels = Array.from({length: 14}, (_, i) => {
         let defaultInst = "Unassigned";
-        if (i === 0) defaultInst = "Drum";
-        else if (i === 2) defaultInst = "Synth Bass"; // Channel 3 (index 2) as requested
+        if (i === 0) defaultInst = "TR-909 Drums";
+        else if (i === 2) defaultInst = "TR-303 Acid Bass";
 
         return {
             id: i + 1,
@@ -727,7 +774,7 @@
         }
     }
 
-    // --- DRUM MACHINE UI & SYNTHESIS ---
+    // --- TR-909 DRUM MACHINE & SYNTHESIS ---
     function renderDrumGrid() {
         const container = document.getElementById('drumGridContainer');
         container.innerHTML = '';
@@ -775,41 +822,60 @@
         renderDrumGrid();
     }
 
-    function playDrumSound(type, volume) {
+    function playTR909Sound(type, volume) {
         initAudioContext();
-        const t = audioCtx.currentTime;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        
-        // Find if any channel is assigned to Drum and use its volume/mute state
         let drumVol = 0.8;
         let drumMuted = false;
         mixerChannels.forEach(ch => {
-            if (ch.assignedInstrument === "Drum") {
+            if (ch.assignedInstrument === "TR-909 Drums") {
                 drumVol = ch.volume;
                 drumMuted = ch.muted;
             }
         });
-
         if (drumMuted) return;
+
+        const t = audioCtx.currentTime;
         const effectiveVol = volume * 0.7 * drumVol;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
 
         if (type === 'kick') {
-            osc.frequency.setValueAtTime(140, t);
-            osc.frequency.exponentialRampToValueAtTime(35, t + 0.15);
-            gain.gain.setValueAtTime(effectiveVol, t);
-            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
+            // TR-909 punchy deep kick synthesis
+            osc.frequency.setValueAtTime(150, t);
+            osc.frequency.exponentialRampToValueAtTime(38, t + 0.2);
+            gain.gain.setValueAtTime(effectiveVol * 1.2, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
             osc.connect(gain);
             gain.connect(drumBus);
             osc.start(t);
-            osc.stop(t + 0.2);
+            osc.stop(t + 0.3);
+        } else if (type === 'snare') {
+            // TR-909 snare snap and body
+            const bufferSize = audioCtx.sampleRate * 0.2;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+
+            const noise = audioCtx.createBufferSource();
+            noise.buffer = buffer;
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'highpass';
+            filter.frequency.value = 1200;
+
+            gain.gain.setValueAtTime(effectiveVol, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
+
+            noise.connect(filter);
+            filter.connect(gain);
+            gain.connect(drumBus);
+            noise.start(t);
         } else {
             let dur = 0.15;
-            if (type === 'openhat') dur = 0.3;
-            if (type === 'crash') dur = 0.8;
-            if (type === 'tomH') { playTom(300, effectiveVol, t); return; }
-            if (type === 'tomM') { playTom(200, effectiveVol, t); return; }
-            if (type === 'tomL') { playTom(110, effectiveVol, t); return; }
+            if (type === 'openhat') dur = 0.35;
+            if (type === 'crash') dur = 0.9;
+            if (type === 'tomH') { playTom(320, effectiveVol, t); return; }
+            if (type === 'tomM') { playTom(210, effectiveVol, t); return; }
+            if (type === 'tomL') { playTom(120, effectiveVol, t); return; }
 
             const bufferSize = audioCtx.sampleRate * dur;
             const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
@@ -820,7 +886,7 @@
             noise.buffer = buffer;
             const filter = audioCtx.createBiquadFilter();
             filter.type = type === 'hihat' || type === 'openhat' ? 'highpass' : 'bandpass';
-            filter.frequency.value = type === 'hihat' ? 6000 : 1200;
+            filter.frequency.value = type === 'hihat' ? 7000 : 1500;
 
             gain.gain.setValueAtTime(effectiveVol, t);
             gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
@@ -836,53 +902,84 @@
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.frequency.setValueAtTime(freq, t);
-        osc.frequency.exponentialRampToValueAtTime(freq * 0.5, t + 0.2);
+        osc.frequency.exponentialRampToValueAtTime(freq * 0.45, t + 0.25);
         gain.gain.setValueAtTime(vol, t);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
         osc.connect(gain);
         gain.connect(drumBus);
         osc.start(t);
-        osc.stop(t + 0.25);
+        osc.stop(t + 0.3);
     }
 
-    // --- CLASSIC KEYBOARD (Version 1 Design) ---
-    const version1Keys = [
-        { note: 'C3', freq: 130.81, type: 'white' },
-        { note: 'C#3', freq: 138.59, type: 'black' },
-        { note: 'D3', freq: 146.83, type: 'white' },
-        { note: 'D#3', freq: 155.56, type: 'black' },
-        { note: 'E3', freq: 164.81, type: 'white' },
-        { note: 'F3', freq: 174.61, type: 'white' },
-        { note: 'F#3', freq: 185.00, type: 'black' },
-        { note: 'G3', freq: 196.00, type: 'white' },
-        { note: 'G#3', freq: 207.65, type: 'black' },
-        { note: 'A3', freq: 220.00, type: 'white' },
-        { note: 'A#3', freq: 233.08, type: 'black' },
-        { note: 'B3', freq: 246.94, type: 'white' },
-        { note: 'C4', freq: 261.63, type: 'white' }
-    ];
-
+    // --- MULTI-OCTAVE KEYBOARD & TR-303 ACID BASS ---
     function renderKeyboard() {
         const kb = document.getElementById('synthKeyboard');
         kb.innerHTML = '';
-        version1Keys.forEach(k => {
-            const el = document.createElement('div');
-            el.className = `key ${k.type === 'black' ? 'black' : ''}`;
-            el.textContent = k.note;
-            el.id = `key-${k.note}`;
-            el.onmousedown = () => {
-                handleKeyPress(k, el);
-            };
-            kb.appendChild(el);
-        });
+        
+        // Generate 2 Octaves starting from baseOctave
+        const notesInOctave = [
+            { name: 'C', type: 'white', semitone: 0 },
+            { name: 'C#', type: 'black', semitone: 1, leftOffset: 32 },
+            { name: 'D', type: 'white', semitone: 2 },
+            { name: 'D#', type: 'black', semitone: 3, leftOffset: 76 },
+            { name: 'E', type: 'white', semitone: 4 },
+            { name: 'F', type: 'white', semitone: 5 },
+            { name: 'F#', type: 'black', semitone: 6, leftOffset: 164 },
+            { name: 'G', type: 'white', semitone: 7 },
+            { name: 'G#', type: 'black', semitone: 8, leftOffset: 208 },
+            { name: 'A', type: 'white', semitone: 9 },
+            { name: 'A#', type: 'black', semitone: 10, leftOffset: 252 },
+            { name: 'B', type: 'white', semitone: 11 }
+        ];
+
+        let whiteKeyCounter = 0;
+        for (let oct = 0; oct < 2; oct++) {
+            const currentOct = baseOctave + oct;
+            notesInOctave.forEach(n => {
+                const noteName = `${n.name}${currentOct}`;
+                const freq = getNoteFrequency(n.semitone + (oct * 12), baseOctave);
+                
+                if (n.type === 'white') {
+                    const el = document.createElement('div');
+                    el.className = 'key-white';
+                    el.textContent = noteName;
+                    el.id = `key-${noteName}`;
+                    el.onmousedown = () => handleKeyPress(freq, noteName, el);
+                    kb.appendChild(el);
+                    whiteKeyCounter++;
+                } else {
+                    const el = document.createElement('div');
+                    el.className = 'key-black';
+                    el.textContent = noteName;
+                    el.id = `key-${noteName}`;
+                    // Position relative to white keys width (44px per white key)
+                    const whiteKeyIdx = whiteKeyCounter - 1;
+                    const leftPos = (whiteKeyIdx * 44) + 30;
+                    el.style.left = leftPos + 'px';
+                    el.onmousedown = () => handleKeyPress(freq, noteName, el);
+                    kb.appendChild(el);
+                }
+            });
+        }
+        document.getElementById('currentOctaveLabel').textContent = `Octave: C${baseOctave} - C${baseOctave+2}`;
     }
 
-    function handleKeyPress(k, element) {
-        playSynthNote(k.freq, element);
+    function getNoteFrequency(semitoneOffset, startOctave) {
+        // C3 frequency = 130.81 Hz
+        const c3Freq = 130.81 * Math.pow(2, startOctave - 3);
+        return c3Freq * Math.pow(2, semitoneOffset / 12);
+    }
 
+    function shiftOctave(delta) {
+        baseOctave = Math.max(1, Math.min(5, baseOctave + delta));
+        renderKeyboard();
+    }
+
+    function handleKeyPress(freq, noteName, element) {
+        playSynthNote(freq, element);
         if (isRecordingMidi) {
             const track = synthTracks[currentSynthTrackIdx];
-            track.matrix[currentStep] = k.note;
+            track.matrix[currentStep] = noteName;
         }
     }
 
@@ -899,11 +996,13 @@
         const filter = audioCtx.createBiquadFilter();
         const gain = audioCtx.createGain();
 
+        // TR-303 / Acid Sawtooth / Square emulation with resonant filter sweep
         osc.type = track.wave;
         osc.frequency.setValueAtTime(freq, t);
 
         filter.type = 'lowpass';
         filter.frequency.setValueAtTime(track.cutoff, t);
+        filter.Q.value = 8.0; // High resonance for acid filter squeak
 
         const release = parseFloat(track.release);
         const vol = track.volume * 0.5;
@@ -953,7 +1052,7 @@
         }
     }
 
-    // --- FULLSCREEN PIANO ROLL MODAL (DAW Style) ---
+    // --- FULLSCREEN PIANO ROLL MODAL (Exact match to reference image) ---
     function openPianoRollModal() {
         const track = synthTracks[currentSynthTrackIdx];
         document.getElementById('modalTrackTitle').textContent = `Track ${currentSynthTrackIdx+1}: ${track.name}`;
@@ -973,6 +1072,7 @@
 
         const track = synthTracks[currentSynthTrackIdx];
 
+        // Build vertical piano keys column matching user reference image
         pianoRollNotes.forEach(k => {
             const keyRow = document.createElement('div');
             keyRow.className = `pr-key-row ${k.type === 'black' ? 'black' : ''}`;
@@ -980,6 +1080,7 @@
             keysCol.appendChild(keyRow);
         });
 
+        // Build 16 steps grid rows (4 Bars / 16 Beats) matching reference layout
         pianoRollNotes.forEach((k, kIdx) => {
             const row = document.createElement('div');
             row.className = 'pr-row';
@@ -994,27 +1095,20 @@
 
                 if (track.matrix[step] === k.note) {
                     cell.classList.add('active');
-                    cell.textContent = k.note;
-                } else {
-                    cell.textContent = '';
                 }
 
                 cell.onclick = () => {
                     if (track.matrix[step] === k.note) {
                         delete track.matrix[step];
                         cell.classList.remove('active');
-                        cell.textContent = '';
                     } else {
                         track.matrix[step] = k.note;
+                        // Clear note in same step row for monophonic clarity
                         for (let otherK = 0; otherK < pianoRollNotes.length; otherK++) {
                             const otherCell = document.getElementById(`pr-cell-${otherK}-${step}`);
-                            if (otherCell) {
-                                otherCell.classList.remove('active');
-                                otherCell.textContent = '';
-                            }
+                            if (otherCell) otherCell.classList.remove('active');
                         }
                         cell.classList.add('active');
-                        cell.textContent = k.note;
                         playSynthNote(k.freq);
                     }
                 };
@@ -1027,6 +1121,18 @@
     function clearFullPianoRoll() {
         synthTracks[currentSynthTrackIdx].matrix = {};
         buildPianoRollWorkspace();
+    }
+
+    // --- SECTION MANAGEMENT ---
+    function addSection() {
+        totalSections++;
+        currentSection = totalSections;
+        updateSectionDisplay();
+    }
+
+    function updateSectionDisplay() {
+        const padded = String(currentSection).padStart(3, '0');
+        document.getElementById('currentSectionDisplay').textContent = padded;
     }
 
     // --- MASTER MIXER ---
@@ -1075,7 +1181,7 @@
         btn.classList.toggle('active', mixerChannels[idx].soloed);
     }
 
-    // --- SCHEDULER ---
+    // --- SCHEDULER & TRANSPORT ---
     function togglePlay() {
         initAudioContext();
         isPlaying = !isPlaying;
@@ -1083,6 +1189,8 @@
         if (isPlaying) {
             btn.classList.add('active');
             currentStep = 0;
+            currentSection = 1;
+            updateSectionDisplay();
             startScheduler();
         } else {
             btn.classList.remove('active');
@@ -1094,14 +1202,14 @@
         const interval = (60 / bpm / 4) * 1000;
         clearInterval(timerId);
         timerId = setInterval(() => {
-            // Play drums
+            // Play TR-909 Drums
             drumTracks.forEach((track) => {
                 if (track.steps[currentStep]) {
-                    playDrumSound(track.type, track.volume);
+                    playTR909Sound(track.type, track.volume);
                 }
             });
 
-            // Play synth tracks from matrix
+            // Play Synth Tracks
             synthTracks.forEach((track, stIdx) => {
                 const noteName = track.matrix[currentStep];
                 if (noteName) {
@@ -1116,7 +1224,7 @@
                 }
             });
 
-            // UI step indicator update on drum grid
+            // Update UI step highlights
             for (let t = 0; t < 10; t++) {
                 for (let s = 0; s < 16; s++) {
                     const el = document.getElementById(`drum-${t}-${s}`);
@@ -1126,7 +1234,6 @@
                 }
             }
 
-            // UI step indicator update on modal piano roll if open
             for (let kIdx = 0; kIdx < pianoRollNotes.length; kIdx++) {
                 for (let s = 0; s < 16; s++) {
                     const cell = document.getElementById(`pr-cell-${kIdx}-${s}`);
@@ -1134,13 +1241,21 @@
                         if (s === currentStep) {
                             cell.style.borderLeft = '2px solid #00ffcc';
                         } else {
-                            cell.style.borderLeft = '1px solid #1a1a22';
+                            cell.style.borderLeft = '1px solid #333';
                         }
                     }
                 }
             }
 
-            currentStep = (currentStep + 1) % 16;
+            currentStep++;
+            if (currentStep >= 16) {
+                currentStep = 0;
+                currentSection++;
+                if (currentSection > totalSections) {
+                    currentSection = 1; // Loop sections
+                }
+                updateSectionDisplay();
+            }
         }, interval);
     }
 
@@ -1193,7 +1308,6 @@
             renderMixer();
         } else if (tabName === 'fx') {
             document.getElementById('tab-fx').classList.add('active');
-            event.target.classList.add('app-active') || document.getElementById('tab-fx').classList.add('active');
             event.target.classList.add('active');
         }
     }
